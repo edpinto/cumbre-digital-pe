@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro — Cumbre Digital Peru 2026</title>
+  <style>
+    /* ===== Variables de diseño (tema oscuro + azul eléctrico) ===== */
+    :root {
+      --fondo: #0a0e1a;
+      --superficie: #121829;
+      --superficie-2: #1a2238;
+      --borde: #2a3452;
+      --texto: #e8ecf5;
+      --texto-suave: #8f9bb8;
+      --acento: #1e90ff;
+      --acento-brillo: #00b4ff;
+      --acento-suave: rgba(30, 144, 255, 0.15);
+      --error: #ff5c7a;
+      --exito: #2ee6a6;
+      --radio: 14px;
+    }
+
+    /* ===== Estilos base ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+      background: var(--fondo);
+      background-image:
+        radial-gradient(ellipse at top left, rgba(30, 144, 255, 0.18), transparent 55%),
+        radial-gradient(ellipse at bottom right, rgba(0, 180, 255, 0.10), transparent 50%);
+      background-attachment: fixed;
+      color: var(--texto);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      line-height: 1.5;
+    }
+
+    /* ===== Encabezado con logo de texto ===== */
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo .marca {
+      background: linear-gradient(90deg, var(--acento), var(--acento-brillo));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .logo .anio {
+      color: var(--texto);
+      font-weight: 300;
+    }
+
+    .subtitulo {
+      color: var(--texto-suave);
+      margin-top: 6px;
+      font-size: 0.98rem;
+    }
+
+    /* ===== Tarjeta contenedora ===== */
+    .tarjeta {
+      width: 100%;
+      max-width: 520px;
+      background: var(--superficie);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      padding: 32px 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(30, 144, 255, 0.05);
+    }
+
+    .tarjeta h2 {
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+    }
+
+    .tarjeta .ayuda {
+      color: var(--texto-suave);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    /* ===== Campos del formulario ===== */
+    .campo {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    label .requerido { color: var(--acento-brillo); }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--texto);
+      background: var(--superficie-2);
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input::placeholder { color: #5d6886; }
+
+    /* Flecha personalizada del selector */
+    select {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238f9bb8' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+    }
+
+    select option { background: var(--superficie-2); }
+
+    input:focus,
+    select:focus {
+      border-color: var(--acento);
+      box-shadow: 0 0 0 3px var(--acento-suave);
+    }
+
+    /* Estado de error en un campo */
+    .campo.invalido input,
+    .campo.invalido select {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px rgba(255, 92, 122, 0.12);
+    }
+
+    .mensaje-error {
+      color: var(--error);
+      font-size: 0.82rem;
+      margin-top: 6px;
+      min-height: 1em;
+      display: none;
+    }
+
+    .campo.invalido .mensaje-error { display: block; }
+
+    /* ===== Botones ===== */
+    .boton {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: #fff;
+      background: linear-gradient(90deg, var(--acento), var(--acento-brillo));
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 8px 24px rgba(30, 144, 255, 0.35);
+    }
+
+    .boton:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 30px rgba(30, 144, 255, 0.5);
+    }
+
+    .boton:active { transform: translateY(0); }
+
+    .boton:focus-visible {
+      outline: 2px solid var(--acento-brillo);
+      outline-offset: 3px;
+    }
+
+    /* ===== Pantalla de confirmación ===== */
+    .oculto { display: none; }
+
+    #confirmacion { text-align: center; }
+
+    .icono-exito {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(46, 230, 166, 0.12);
+      border: 2px solid var(--exito);
+      color: var(--exito);
+      font-size: 2rem;
+      animation: aparecer 0.4s ease-out;
+    }
+
+    .numero-registro {
+      display: inline-block;
+      margin: 18px 0;
+      padding: 12px 24px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--acento-brillo);
+      background: var(--acento-suave);
+      border: 1px dashed var(--acento);
+      border-radius: 10px;
+    }
+
+    .nombre-asistente {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .bienvenida {
+      color: var(--texto-suave);
+      margin-bottom: 20px;
+    }
+
+    @keyframes aparecer {
+      from { transform: scale(0.6); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    footer {
+      margin-top: 28px;
+      color: var(--texto-suave);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    /* ===== Ajustes para pantallas pequeñas ===== */
+    @media (max-width: 480px) {
+      .tarjeta { padding: 24px 18px; }
+      .numero-registro { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado con el logo de texto del evento -->
+  <header>
+    <div class="logo">
+      <span class="marca">Cumbre Digital Peru</span> <span class="anio">2026</span>
+    </div>
+    <p class="subtitulo">Transformación digital para PyMEs</p>
+  </header>
+
+  <main class="tarjeta">
+
+    <!-- ===== Sección 1: Formulario de registro ===== -->
+    <section id="seccion-formulario">
+      <h2>Registro de asistentes</h2>
+      <p class="ayuda">Todos los campos marcados con <span style="color: var(--acento-brillo)">*</span> son obligatorios.</p>
+
+      <form id="formulario" novalidate>
+        <div class="campo">
+          <label for="nombre">Nombre completo <span class="requerido">*</span></label>
+          <input type="text" id="nombre" name="nombre" placeholder="Ej. María Quispe Rojas" autocomplete="name">
+          <p class="mensaje-error" id="error-nombre"></p>
+        </div>
+
+        <div class="campo">
+          <label for="email">Correo electrónico <span class="requerido">*</span></label>
+          <input type="email" id="email" name="email" placeholder="nombre@empresa.com" autocomplete="email">
+          <p class="mensaje-error" id="error-email"></p>
+        </div>
+
+        <div class="campo">
+          <label for="empresa">Empresa u organización <span class="requerido">*</span></label>
+          <input type="text" id="empresa" name="empresa" placeholder="Ej. Innova SAC" autocomplete="organization">
+          <p class="mensaje-error" id="error-empresa"></p>
+        </div>
+
+        <div class="campo">
+          <label for="area">Área de interés <span class="requerido">*</span></label>
+          <select id="area" name="area">
+            <option value="">Selecciona un área…</option>
+            <option value="Tecnología">Tecnología</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Negocios">Negocios</option>
+            <option value="Emprendimiento">Emprendimiento</option>
+          </select>
+          <p class="mensaje-error" id="error-area"></p>
+        </div>
+
+        <button type="submit" class="boton">Registrarme</button>
+      </form>
+    </section>
+
+    <!-- ===== Sección 2: Confirmación (oculta al inicio) ===== -->
+    <section id="confirmacion" class="oculto" aria-live="polite">
+      <div class="icono-exito" aria-hidden="true">✓</div>
+      <h2>¡Registro exitoso!</h2>
+      <div class="numero-registro" id="numero-registro">REG-0000</div>
+      <p class="nombre-asistente" id="nombre-asistente"></p>
+      <p class="bienvenida" id="mensaje-bienvenida"></p>
+      <button type="button" class="boton" id="boton-otro">Registrar a otra persona</button>
+    </section>
+
+  </main>
+
+  <footer>© 2026 Cumbre Digital Peru · Lima, Perú</footer>
+
+  <script>
+    // ===== Referencias a elementos del DOM =====
+    const formulario = document.getElementById("formulario");
+    const seccionFormulario = document.getElementById("seccion-formulario");
+    const seccionConfirmacion = document.getElementById("confirmacion");
+    const botonOtro = document.getElementById("boton-otro");
+
+    // Expresión regular para validar el formato del correo electrónico
+    const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    // Reglas de validación por campo: cada una devuelve un mensaje de error o cadena vacía
+    const reglas = {
+      nombre: (valor) => {
+        if (!valor) return "Por favor, ingresa tu nombre completo.";
+        if (valor.length < 3) return "El nombre debe tener al menos 3 caracteres.";
+        return "";
+      },
+      email: (valor) => {
+        if (!valor) return "Por favor, ingresa tu correo electrónico.";
+        if (!REGEX_EMAIL.test(valor)) return "El formato del correo no es válido (ej. nombre@empresa.com).";
+        return "";
+      },
+      empresa: (valor) => {
+        if (!valor) return "Por favor, ingresa el nombre de tu empresa u organización.";
+        return "";
+      },
+      area: (valor) => {
+        if (!valor) return "Por favor, selecciona un área de interés.";
+        return "";
+      }
+    };
+
+    // Valida un campo individual y muestra u oculta su mensaje de error
+    function validarCampo(id) {
+      const elemento = document.getElementById(id);
+      const contenedor = elemento.closest(".campo");
+      const mensaje = reglas[id](elemento.value.trim());
+
+      document.getElementById("error-" + id).textContent = mensaje;
+      contenedor.classList.toggle("invalido", mensaje !== "");
+      elemento.setAttribute("aria-invalid", mensaje !== "" ? "true" : "false");
+
+      return mensaje === "";
+    }
+
+    // Genera un número de registro con formato REG-XXXX (4 dígitos aleatorios)
+    function generarNumeroRegistro() {
+      const digitos = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+      return "REG-" + digitos;
+    }
+
+    // Quita el error de un campo en cuanto el usuario lo corrige
+    Object.keys(reglas).forEach((id) => {
+      const elemento = document.getElementById(id);
+      const evento = elemento.tagName === "SELECT" ? "change" : "input";
+      elemento.addEventListener(evento, () => {
+        if (elemento.closest(".campo").classList.contains("invalido")) {
+          validarCampo(id);
+        }
+      });
+    });
+
+    // Manejo del envío del formulario
+    formulario.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      // Validar todos los campos (sin cortar en el primero para mostrar todos los errores)
+      const resultados = Object.keys(reglas).map(validarCampo);
+      const esValido = resultados.every(Boolean);
+
+      if (!esValido) {
+        // Enfocar el primer campo con error
+        const primerError = formulario.querySelector(".campo.invalido input, .campo.invalido select");
+        if (primerError) primerError.focus();
+        return;
+      }
+
+      // Datos del asistente
+      const nombre = document.getElementById("nombre").value.trim();
+      const area = document.getElementById("area").value;
+
+      // Rellenar la pantalla de confirmación
+      document.getElementById("numero-registro").textContent = generarNumeroRegistro();
+      document.getElementById("nombre-asistente").textContent = nombre;
+      document.getElementById("mensaje-bienvenida").textContent =
+        "¡Bienvenido(a) a Cumbre Digital Peru 2026! Tu lugar está confirmado en el área de " +
+        area + ". Guarda tu número de registro, lo necesitarás para acceder al evento.";
+
+      // Cambiar de pantalla
+      seccionFormulario.classList.add("oculto");
+      seccionConfirmacion.classList.remove("oculto");
+      botonOtro.focus();
+    });
+
+    // Botón "Registrar a otra persona": limpia el formulario y vuelve a mostrarlo
+    botonOtro.addEventListener("click", () => {
+      formulario.reset();
+      formulario.querySelectorAll(".campo").forEach((c) => c.classList.remove("invalido"));
+      formulario.querySelectorAll("input, select").forEach((el) => el.removeAttribute("aria-invalid"));
+
+      seccionConfirmacion.classList.add("oculto");
+      seccionFormulario.classList.remove("oculto");
+      document.getElementById("nombre").focus();
+    });
+  </script>
+</body>
+</html>
