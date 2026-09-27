@@ -1,0 +1,20 @@
+# Ambiente virtual de Python
+venv/
+__pycache__/
+*.pyc
+.python-version
+
+# Base de datos local (se crea sola al arrancar)
+evento.db
+
+# Dependencias de Node (Playwright)
+node_modules/
+
+# Capturas de pruebas con Playwright MCP
+.playwright-mcp/
+
+# Configuración local de Claude Code
+.claude/
+
+# Archivos de log
+*.log

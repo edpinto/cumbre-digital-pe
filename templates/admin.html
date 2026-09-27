@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block titulo %}Administración{% endblock %}
+{% block clase_tarjeta %}ancha{% endblock %}
+
+{% block contenido %}
+  <h2>Asistentes registrados</h2>
+  <p class="ayuda">Listado de inscritos, del más reciente al más antiguo.</p>
+
+  <!-- ===== Resumen: total y conteo por área ===== -->
+  <div class="resumen">
+    <div class="dato">
+      <span class="valor" id="total-asistentes">{{ asistentes | length }}</span>
+      <span class="etiqueta">Total</span>
+    </div>
+    {% for area, total in conteo.items() %}
+    <div class="dato">
+      <span class="valor">{{ total }}</span>
+      <span class="etiqueta">{{ area }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ===== Tabla de asistentes ===== -->
+  {% if asistentes %}
+  <div class="tabla-contenedor">
+    <table>
+      <thead>
+        <tr>
+          <th>Registro</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Empresa</th>
+          <th>Área</th>
+          <th>Fecha (UTC)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in asistentes %}
+        <tr>
+          <td class="codigo">{{ a.id | numero_registro }}</td>
+          <td>{{ a.nombre }}</td>
+          <td>{{ a.email }}</td>
+          <td>{{ a.empresa }}</td>
+          <td>{{ a.area }}</td>
+          <td>{{ a.fecha_registro }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="vacio">Todavía no hay asistentes registrados.</p>
+  {% endif %}
+
+  <a href="{{ url_for('inicio') }}" class="enlace-volver">← Volver al formulario</a>
+{% endblock %}

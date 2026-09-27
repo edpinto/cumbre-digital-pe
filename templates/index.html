@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+  <!-- ===== Formulario de registro ===== -->
+  <section id="seccion-formulario">
+    <h2>Registro de asistentes</h2>
+    <p class="ayuda">Todos los campos marcados con <span style="color: var(--acento-brillo)">*</span> son obligatorios.</p>
+
+    <form id="formulario" method="post" action="{{ url_for('registrar') }}" novalidate>
+      <div class="campo {% if errores.nombre %}invalido{% endif %}">
+        <label for="nombre">Nombre completo <span class="requerido">*</span></label>
+        <input type="text" id="nombre" name="nombre" placeholder="Ej. María Quispe Rojas" autocomplete="name"
+               value="{{ datos.nombre or '' }}" {% if errores.nombre %}aria-invalid="true"{% endif %}>
+        <p class="mensaje-error" id="error-nombre">{{ errores.nombre or '' }}</p>
+      </div>
+
+      <div class="campo {% if errores.email %}invalido{% endif %}">
+        <label for="email">Correo electrónico <span class="requerido">*</span></label>
+        <input type="email" id="email" name="email" placeholder="nombre@empresa.com" autocomplete="email"
+               value="{{ datos.email or '' }}" {% if errores.email %}aria-invalid="true"{% endif %}>
+        <p class="mensaje-error" id="error-email">{{ errores.email or '' }}</p>
+      </div>
+
+      <div class="campo {% if errores.empresa %}invalido{% endif %}">
+        <label for="empresa">Empresa u organización <span class="requerido">*</span></label>
+        <input type="text" id="empresa" name="empresa" placeholder="Ej. Innova SAC" autocomplete="organization"
+               value="{{ datos.empresa or '' }}" {% if errores.empresa %}aria-invalid="true"{% endif %}>
+        <p class="mensaje-error" id="error-empresa">{{ errores.empresa or '' }}</p>
+      </div>
+
+      <div class="campo {% if errores.area %}invalido{% endif %}">
+        <label for="area">Área de interés <span class="requerido">*</span></label>
+        <select id="area" name="area" {% if errores.area %}aria-invalid="true"{% endif %}>
+          <option value="">Selecciona un área…</option>
+          {% for area in areas %}
+          <option value="{{ area }}" {% if datos.area == area %}selected{% endif %}>{{ area }}</option>
+          {% endfor %}
+        </select>
+        <p class="mensaje-error" id="error-area">{{ errores.area or '' }}</p>
+      </div>
+
+      <button type="submit" class="boton">Registrarme</button>
+    </form>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/formulario.js') }}"></script>
+{% endblock %}
