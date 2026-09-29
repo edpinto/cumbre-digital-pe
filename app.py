@@ -1,39 +1,34 @@
-"""Servidor Flask de Cumbre Digital Peru 2026: registro de asistentes con SQLite."""
+"""Servidor Flask de Cumbre Digital Peru 2026: registro de asistentes con Supabase (PostgreSQL)."""
 
 import os
 import re
-import sqlite3
 
+import psycopg
+from dotenv import load_dotenv
 from flask import Flask, abort, g, jsonify, redirect, render_template, request, url_for
+from psycopg.rows import dict_row
 
 # ===== Configuración =====
-DIRECTORIO_BASE = os.path.dirname(os.path.abspath(__file__))
-# En Render se puede apuntar a un disco persistente con la variable DATABASE_PATH
-RUTA_BD = os.environ.get("DATABASE_PATH", os.path.join(DIRECTORIO_BASE, "evento.db"))
+# En local se lee el archivo .env; en Render se define DATABASE_URL en el panel
+load_dotenv()
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "Falta la variable de entorno DATABASE_URL con la cadena de conexión de Supabase. "
+        "Cópiala desde Supabase → Connect → Session pooler y guárdala en el archivo .env."
+    )
 
 AREAS = ["Tecnología", "Marketing", "Negocios", "Emprendimiento"]
 REGEX_EMAIL = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$")
-
-ESQUEMA = """
-CREATE TABLE IF NOT EXISTS asistentes (
-    id             INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre         TEXT NOT NULL,
-    email          TEXT NOT NULL UNIQUE,
-    empresa        TEXT NOT NULL,
-    area           TEXT NOT NULL CHECK (area IN ('Tecnología', 'Marketing', 'Negocios', 'Emprendimiento')),
-    fecha_registro TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-"""
 
 app = Flask(__name__)
 
 
 # ===== Base de datos =====
 def obtener_bd():
-    """Devuelve la conexión a SQLite de la petición actual (una por petición)."""
+    """Devuelve la conexión a Supabase de la petición actual (una por petición)."""
     if "bd" not in g:
-        g.bd = sqlite3.connect(RUTA_BD)
-        g.bd.row_factory = sqlite3.Row
+        g.bd = psycopg.connect(DATABASE_URL, row_factory=dict_row)
     return g.bd
 
 
@@ -45,18 +40,17 @@ def cerrar_bd(_error):
         bd.close()
 
 
-def inicializar_bd():
-    """Crea la tabla de asistentes si todavía no existe."""
-    with sqlite3.connect(RUTA_BD) as conexion:
-        conexion.executescript(ESQUEMA)
-
-
 def numero_registro(id_asistente):
     """Convierte el id en el código visible, p. ej. 7 → REG-0007."""
     return f"REG-{id_asistente:04d}"
 
 
-app.jinja_env.filters["numero_registro"] = numero_registro
+def formato_fecha(fecha):
+    """Muestra la fecha de registro como 2026-09-28 14:30."""
+    return fecha.strftime("%Y-%m-%d %H:%M") if fecha else ""
+
+
+app.jinja_env.filters["formato_fecha"] = formato_fecha
 
 
 # ===== Validación =====
@@ -102,16 +96,23 @@ def registrar():
 
     errores = validar(datos)
     if not errores:
+        bd = obtener_bd()
         try:
-            bd = obtener_bd()
-            cursor = bd.execute(
-                "INSERT INTO asistentes (nombre, email, empresa, area) VALUES (?, ?, ?, ?)",
-                (datos["nombre"], datos["email"], datos["empresa"], datos["area"]),
+            # Se reserva el id primero para poder guardar su número de registro en la misma fila
+            id_asistente = bd.execute(
+                "SELECT nextval(pg_get_serial_sequence('asistentes', 'id')) AS id"
+            ).fetchone()["id"]
+            bd.execute(
+                """INSERT INTO asistentes (id, nombre, email, empresa, area_interes, numero_registro)
+                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                (id_asistente, datos["nombre"], datos["email"], datos["empresa"],
+                 datos["area"], numero_registro(id_asistente)),
             )
             bd.commit()
             # Patrón POST → redirección → GET para evitar registros duplicados al recargar
-            return redirect(url_for("confirmacion", id_asistente=cursor.lastrowid))
-        except sqlite3.IntegrityError:
+            return redirect(url_for("confirmacion", id_asistente=id_asistente))
+        except psycopg.errors.UniqueViolation:
+            bd.rollback()
             errores["email"] = "Este correo ya está registrado."
 
     return render_template("index.html", areas=AREAS, datos=datos, errores=errores), 400
@@ -120,7 +121,7 @@ def registrar():
 @app.route("/confirmacion/<int:id_asistente>")
 def confirmacion(id_asistente):
     asistente = obtener_bd().execute(
-        "SELECT * FROM asistentes WHERE id = ?", (id_asistente,)
+        "SELECT * FROM asistentes WHERE id = %s", (id_asistente,)
     ).fetchone()
     if asistente is None:
         abort(404)
@@ -132,24 +133,23 @@ def admin():
     bd = obtener_bd()
     asistentes = bd.execute("SELECT * FROM asistentes ORDER BY id DESC").fetchall()
     conteo = {area: 0 for area in AREAS}
-    for fila in bd.execute("SELECT area, COUNT(*) AS total FROM asistentes GROUP BY area"):
-        conteo[fila["area"]] = fila["total"]
+    for fila in bd.execute(
+        "SELECT area_interes, COUNT(*) AS total FROM asistentes GROUP BY area_interes"
+    ):
+        conteo[fila["area_interes"]] = fila["total"]
     return render_template("admin.html", asistentes=asistentes, conteo=conteo)
 
 
 @app.route("/api/asistentes")
 def api_asistentes():
     filas = obtener_bd().execute("SELECT * FROM asistentes ORDER BY id").fetchall()
-    return jsonify([dict(fila, numero_registro=numero_registro(fila["id"])) for fila in filas])
+    return jsonify(filas)
 
 
 @app.errorhandler(404)
 def no_encontrado(_error):
     return render_template("404.html"), 404
 
-
-# La tabla se crea al importar el módulo (sirve tanto para `flask run` como para gunicorn)
-inicializar_bd()
 
 if __name__ == "__main__":
     app.run(debug=True)

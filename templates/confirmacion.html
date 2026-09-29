@@ -7,11 +7,11 @@
   <section id="confirmacion" aria-live="polite">
     <div class="icono-exito" aria-hidden="true">✓</div>
     <h2>¡Registro exitoso!</h2>
-    <div class="numero-registro" id="numero-registro">{{ asistente.id | numero_registro }}</div>
+    <div class="numero-registro" id="numero-registro">{{ asistente.numero_registro }}</div>
     <p class="nombre-asistente" id="nombre-asistente">{{ asistente.nombre }}</p>
     <p class="bienvenida" id="mensaje-bienvenida">
       ¡Bienvenido(a) a Cumbre Digital Peru 2026! Tu lugar está confirmado en el área de
-      {{ asistente.area }}. Guarda tu número de registro, lo necesitarás para acceder al evento.
+      {{ asistente.area_interes }}. Guarda tu número de registro, lo necesitarás para acceder al evento.
     </p>
     <a href="{{ url_for('inicio') }}" class="boton" id="boton-otro">Registrar a otra persona</a>
   </section>

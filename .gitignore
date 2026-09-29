@@ -4,7 +4,7 @@ __pycache__/
 *.pyc
 .python-version
 
-# Base de datos local (se crea sola al arrancar)
+# Base de datos local de la versión SQLite anterior
 evento.db
 
 # Dependencias de Node (Playwright)
@@ -14,7 +14,10 @@ node_modules/
 .playwright-mcp/
 
 # Configuración local de Claude Code
-.claude/
+.claude/settings.local.json
 
 # Archivos de log
 *.log
+
+# Variables de entorno con credenciales (nunca subir)
+.env

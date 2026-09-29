@@ -5,23 +5,30 @@ App web de registro de asistentes para "Cumbre Digital Peru 2026".
 
 ## Stack tecnológico
 - Fase 1: HTML + CSS + JavaScript (sin servidor)
-- Fase 2: Python 3 + Flask + SQLite
+- Fase 2: Python 3 + Flask + PostgreSQL en Supabase (psycopg v3, `psycopg[binary]`; no usar psycopg2)
 - Despliegue: Render.com (opcional)
 
 ## Reglas de trabajo
 - Todo el contenido y comentarios en español
 - Sin frameworks CSS externos (solo CSS puro)
 - Diseño responsivo, tema oscuro, moderno
-- La base de datos se llama evento.db y está en la raíz del proyecto
+- La base de datos es PostgreSQL en Supabase; la conexión se lee de la variable DATABASE_URL
+  (en local desde .env, en Render desde el panel). Usar el "Session pooler" (IPv4)
+- Si la contraseña tiene caracteres especiales (@, $, :, /, #...), codificarlos en la URL (%40, %24...)
+- Nunca subir .env al repositorio; .env.example es la plantilla sin credenciales
 - Sin autenticación ni login de momento
 - Mensajes de error claros en español
 
 ## Estructura del proyecto (Fase 2)
 - app.py → servidor Flask principal
-- evento.db → base de datos SQLite
-- templates/ → páginas HTML (index, confirmacion, admin)
+- templates/ → páginas HTML (index, confirmacion, admin, 404)
 - requirements.txt → dependencias Python
 - Procfile → configuración para Render
+- .env.example → plantilla de DATABASE_URL (copiar como .env)
+
+## Tabla asistentes (Supabase)
+- id (serial), nombre, email (único), empresa, area_interes,
+  numero_registro (único, formato REG-0001), fecha_registro (default now())
 
 ## Contexto del evento
 - Nombre: Cumbre Digital Peru 2026
@@ -31,5 +38,6 @@ App web de registro de asistentes para "Cumbre Digital Peru 2026".
 
 ## Servidores MCP disponibles (alcance proyecto)
 - github: para subir el código al repositorio
-- sqlite: para interactuar con evento.db (se agrega en Fase 2)
+- supabase: para consultar la base de datos PostgreSQL del proyecto
+- sqlite: solo para consultar el evento.db antiguo (versión SQLite anterior)
 - playwright: para pruebas automáticas (Fase 3)
