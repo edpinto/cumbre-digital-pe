@@ -15,7 +15,7 @@ App web de registro de asistentes para "Cumbre Digital Peru 2026".
 - La base de datos es PostgreSQL en Supabase; la conexión se lee de la variable DATABASE_URL
   (en local desde .env, en Render desde el panel). Usar el "Session pooler" (IPv4)
 - Si la contraseña tiene caracteres especiales (@, $, :, /, #...), codificarlos en la URL (%40, %24...)
-- Nunca subir .env al repositorio; .env.example es la plantilla sin credenciales
+- Nunca subir .env al repositorio
 - Sin autenticación ni login de momento
 - Mensajes de error claros en español
 
@@ -24,7 +24,6 @@ App web de registro de asistentes para "Cumbre Digital Peru 2026".
 - templates/ → páginas HTML (index, confirmacion, admin, 404)
 - requirements.txt → dependencias Python
 - Procfile → configuración para Render
-- .env.example → plantilla de DATABASE_URL (copiar como .env)
 
 ## Tabla asistentes (Supabase)
 - id (serial), nombre, email (único), empresa, area_interes,
